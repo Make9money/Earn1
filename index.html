@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Your YouTube Channel</title>
+  <style>
+    body {
+      background-color: black;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 1.4;
+      color: white; /* Default text color */
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .typing-effect {
+      display: inline-block;
+      margin: 5px;
+      white-space: pre; /* Preserve whitespace */
+      text-shadow: 0 0 5px #a29bfe; /* Background glow */
+    }
+
+    .content .keyword {
+      color: #ffa500; /* Keywords in orange */
+    }
+
+    .identifier {
+      color: #f4ff1cc9; /* Identifiers in blue */
+    }
+
+    .string {
+      color: #d3c0b9; /* Strings in pink */
+    }
+
+    .comment {
+      color: #608b4e; /* Comments in green */
+    }
+
+    .number {
+      color: rgb(8, 217, 217); /* Numbers in cyan */
+    }
+
+    .symbol {
+      color: rgb(255, 0, 0); /* Symbols in white */
+    }
+
+    .operator {
+      color: orange; /* Operators in orange */
+    }
+
+    /* Space color classes */
+    .space {
+      color: orange;
+    }
+
+    .space-1 {
+      color: red;
+    }
+
+    .space-2 {
+      color: green;
+    }
+
+    .space-3 {
+      color: #ffff00;
+    }
+
+    #footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: auto;
+      background-color: #333;
+      padding: 10px;
+    }
+
+    #startButton,
+    #nextButton,
+    #stopButton {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+    }
+
+    #startButton:hover,
+    #nextButton:hover,
+    #stopButton:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="content"></div>
+  <div id="footer">
+    <button id="startButton" onclick="startTyping()">Start Typing</button>
+    <button id="nextButton" onclick="nextLine()">Next Line</button>
+    <button id="stopButton" onclick="stopTyping()">Stop Typing</button>
+  </div>
+
+  <script>
+    var currentSpaceColorIndex = 1;
+    var typingInterval;
+    var isTyping = false;
+
+    var code = `
+def add_numbers(num1, num2):
+ result = num1 + num2
+ return result
+
+def add_numbers_with_input():
+ num1 = int(input('Enter the first number: '))
+ num2 = int(input('Enter the second number: '))
+ result = add_numbers(num1, num2)
+ print('The sum is:', result)
+ `;
+
+    var i = 0;
+    var j = 0;
+    var lines = code.split('\n');
+    var e = document.getElementById("content");
+
+    function doLine() {
+      if (j < lines[i].length && isTyping) {
+        var char = lines[i][j];
+        var styleClass = getStyleClass(char);
+        e.innerHTML += `<span class="${styleClass}">${char}</span>`;
+        j++;
+        setTimeout(doLine, 150); // Adjust the typing speed here
+      } else {
+        e.innerHTML += "<br/>";
+        i++;
+        if (i < lines.length && isTyping) {
+          j = 0;
+          e.innerHTML += '<div class="typing-effect"></div>';
+          currentSpaceColorIndex = 1; // Reset space color index
+          setTimeout(doLine, 500); // Pause between lines
+        }
+      }
+    }
+
+    function getStyleClass(char) {
+      if (/[a-zA-Z_]\w*\b/.test(char)) {
+        if (/\b(def|return)\b/.test(char)) {
+          return 'content keyword';
+        } else {
+          return 'content identifier';
+        }
+      } else if (/[{}:;,\[\]]/.test(char)) {
+        return 'content symbol';
+      } else if (/[()+*\/-]/.test(char)) {
+        return 'content operator';
+      } else if (/"*?"/.test(char) || /'.*?'/.test(char)) {
+        return 'content string';
+      } else if (/^#*/.test(char)) {
+        return 'content comment';
+      } else if (char === ' ') {
+        return 'content space-' + currentSpaceColorIndex;
+      }
+      return 'typing-effect';
+    }
+
+    function startTyping() {
+      if (!isTyping) {
+        isTyping = true;
+        e.innerHTML = ''; // Clear previous content
+        i = 0;
+        j = 0;
+        doLine(); // Start the typing animation
+      }
+    }
+
+    function nextLine() {
+      if (i < lines.length && !isTyping) {
+        startTyping();
+      }
+    }
+
+    function stopTyping() {
+      isTyping = false;
+    }
+  </script>
+</body>
+
+</html>
